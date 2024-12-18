@@ -1,11 +1,3 @@
-<!--
- * @Descripttion: 组件业务名
- * @version: 
- * @Author: dty
- * @Date: 2024-12-18 15:57:53
- * @LastEditors: dty
- * @LastEditTime: 2024-12-18 15:58:05
--->
 <template>
   <el-container class="layout-container">
     <el-aside width="200px">
@@ -30,8 +22,8 @@
         <div class="header-right">
           <el-dropdown @command="handleCommand">
             <span class="el-dropdown-link">
-              {{ userStore.name
-              }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
+              {{ userStore.userInfo?.name }}
+              <el-icon class="el-icon--right"><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -51,8 +43,8 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
-import { Monitor, Folder } from '@element-plus/icons-vue'
+import { useUserStore } from '../stores'
+import { Monitor, Folder, ArrowDown } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -96,5 +88,7 @@ const handleCommand = (command) => {
 .el-dropdown-link {
   cursor: pointer;
   color: #409eff;
+  display: flex;
+  align-items: center;
 }
 </style>
