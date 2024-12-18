@@ -22,7 +22,7 @@
         <div class="header-right">
           <el-dropdown @command="handleCommand">
             <span class="el-dropdown-link">
-              {{ userStore.userInfo?.name }}
+              {{ userStore.userInfo?.name || '用户' }}
               <el-icon class="el-icon--right"><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
@@ -43,7 +43,7 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import { useUserStore } from '../stores'
+import { useUserStore } from '../stores/modules/user'
 import { Monitor, Folder, ArrowDown } from '@element-plus/icons-vue'
 
 const route = useRoute()
