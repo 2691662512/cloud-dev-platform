@@ -4,7 +4,7 @@
       <template #header>
         <h2 class="login-title">云开发平台</h2>
       </template>
-      
+
       <el-form
         ref="loginFormRef"
         :model="loginForm"
@@ -57,14 +57,51 @@ const loginFormRef = ref()
 
 const loginForm = reactive({
   username: '',
-  password: ''
+  password: '',
 })
 
 const loginRules = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
-  ]
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
+
+const handleLogin = async () => {
+  try {
+    await loginFormRef.value.validate()
+    loading.value = true
+    // 这里添加实际的登录逻辑
+    userStore.setToken('mock-token')
+    userStore.setUserInfo({ name: loginForm.username })
+    ElMessage.success('登录成功')
+    router.push('/')
+  } catch (error) {
+    ElMessage.error(error.message || '登录失败')
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
+<style scoped>
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
+}
+
+.login-card {
+  width: 400px;
+}
+
+.login-title {
+  text-align: center;
+  margin: 0;
+  color: #409eff;
+}
+
+.login-button {
+  width: 100%;
+}
+</style>

@@ -1,107 +1,74 @@
+<!--
+ * @Descripttion: 组件业务名
+ * @version: 
+ * @Author: dty
+ * @Date: 2024-12-18 16:00:01
+ * @LastEditors: dty
+ * @LastEditTime: 2024-12-18 17:06:11
+-->
 <template>
-  <div class="login-container">
-    <el-card class="login-card">
-      <template #header>
-        <h2 class="login-title">云开发平台</h2>
-      </template>
+  <div class="projects-container">
+    <div class="projects-header">
+      <el-button type="primary" @click="handleCreate"> 创建项目 </el-button>
+    </div>
 
-      <el-form
-        ref="loginFormRef"
-        :model="loginForm"
-        :rules="loginRules"
-        @keyup.enter="handleLogin"
-      >
-        <el-form-item prop="username">
-          <el-input
-            v-model="loginForm.username"
-            placeholder="用户名"
-            prefix-icon="User"
-          />
-        </el-form-item>
-
-        <el-form-item prop="password">
-          <el-input
-            v-model="loginForm.password"
-            type="password"
-            placeholder="密码"
-            prefix-icon="Lock"
-            show-password
-          />
-        </el-form-item>
-
-        <el-form-item>
-          <el-button
-            :loading="loading"
-            type="primary"
-            class="login-button"
-            @click="handleLogin"
-          >
-            登录
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+    <el-table :data="projectList" style="width: 100%">
+      <el-table-column prop="name" label="项目名称" />
+      <el-table-column prop="description" label="描述" />
+      <el-table-column prop="status" label="状态">
+        <template #default="{ row }">
+          <el-tag :type="row.status === 'running' ? 'success' : 'info'">
+            {{ row.status === 'running' ? '运行中' : '已停止' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="200">
+        <template #default="{ row }">
+          <el-button-group>
+            <el-button type="primary" link @click="handleEdit(row)">
+              编辑
+            </el-button>
+            <el-button type="danger" link @click="handleDelete(row)">
+              删除
+            </el-button>
+          </el-button-group>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '../../stores'
-import { ElMessage } from 'element-plus'
+import { ref } from 'vue'
 
-const router = useRouter()
-const userStore = useUserStore()
-const loading = ref(false)
-const loginFormRef = ref()
+const projectList = ref([
+  {
+    id: 1,
+    name: '示例项目',
+    description: '这是一个示例项目',
+    status: 'running',
+  },
+])
 
-const loginForm = reactive({
-  username: '',
-  password: '',
-})
-
-const loginRules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+const handleCreate = () => {
+  // 实现创建项目的逻辑
 }
 
-const handleLogin = async () => {
-  try {
-    await loginFormRef.value.validate()
-    loading.value = true
-    // 这里添加实际的登录逻辑
-    userStore.setToken('mock-token')
-    userStore.setUserInfo({ name: loginForm.username })
-    ElMessage.success('登录成功')
-    router.push('/')
-  } catch (error) {
-    ElMessage.error(error.message || '登录失败')
-  } finally {
-    loading.value = false
-  }
+const handleEdit = (row) => {
+  // 实现编辑项目的逻辑
+}
+
+const handleDelete = (row) => {
+  // 实现删除项目的逻辑
 }
 </script>
 
 <style scoped>
-.login-container {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f5f5f5;
+.projects-container {
+  padding: 20px;
 }
 
-.login-card {
-  width: 400px;
-}
-
-.login-title {
-  text-align: center;
-  margin: 0;
-  color: #409eff;
-}
-
-.login-button {
-  width: 100%;
+.projects-header {
+  margin-bottom: 20px;
 }
 </style>
