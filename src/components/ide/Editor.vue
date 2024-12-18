@@ -14,7 +14,10 @@
           :label="file.name"
           :name="file.id"
         >
-          <div ref="editorContainer" class="monaco-editor"></div>
+          <div
+            :ref="(el) => setEditorRef(el, file.id)"
+            class="monaco-editor"
+          ></div>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -38,60 +41,37 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close-file', 'change-file'])
-
 const ideStore = useIdeStore()
-const editorContainer = ref(null)
-const editor = ref(null)
 const activeTab = ref(null)
+const editors = new Map() // 存储编辑器实例
 
-// 初始化编辑器
-onMounted(() => {
-  if (editorContainer.value) {
-    editor.value = monaco.editor.create(editorContainer.value, {
-      value: '',
-      language: 'javascript',
+// 设置编辑器容器引用
+const setEditorRef = (el, fileId) => {
+  if (el && !editors.has(fileId)) {
+    const editor = monaco.editor.create(el, {
+      value: props.openedFiles.find((f) => f.id === fileId)?.content || '',
+      language: getLanguage(
+        props.openedFiles.find((f) => f.id === fileId)?.name
+      ),
       theme: 'vs-dark',
       automaticLayout: true,
-      minimap: {
-        enabled: true,
-      },
+      minimap: { enabled: true },
     })
+
+    editors.set(fileId, editor)
 
     // 监听内容变化
-    editor.value.onDidChangeModelContent(() => {
-      if (props.currentFile) {
-        emit('change-file', {
-          ...props.currentFile,
-          content: editor.value.getValue(),
-        })
-      }
+    editor.onDidChangeModelContent(() => {
+      emit('change-file', {
+        id: fileId,
+        content: editor.getValue(),
+      })
     })
   }
-})
+}
 
-// 销毁编辑器
-onBeforeUnmount(() => {
-  if (editor.value) {
-    editor.value.dispose()
-  }
-})
-
-// 监听当前文件变化
-watch(
-  () => props.currentFile,
-  (newFile) => {
-    if (newFile && editor.value) {
-      activeTab.value = newFile.id
-      editor.value.setValue(newFile.content || '')
-      editor.value.updateOptions({
-        language: getLanguage(newFile.name),
-      })
-    }
-  },
-  { immediate: true }
-)
-
-const getLanguage = (filename) => {
+// 获取文件语言
+const getLanguage = (filename = '') => {
   const ext = filename.split('.').pop()
   const languageMap = {
     js: 'javascript',
@@ -99,7 +79,7 @@ const getLanguage = (filename) => {
     html: 'html',
     css: 'css',
     json: 'json',
-    vue: 'vue',
+    vue: 'javascript',
     py: 'python',
     java: 'java',
     go: 'go',
@@ -107,16 +87,29 @@ const getLanguage = (filename) => {
   return languageMap[ext] || 'plaintext'
 }
 
+// 关闭标签页
 const closeTab = (targetName) => {
+  const editor = editors.get(targetName)
+  if (editor) {
+    editor.dispose()
+    editors.delete(targetName)
+  }
   emit('close-file', targetName)
 }
 
+// 切换标签页
 const switchTab = (tab) => {
   const file = props.openedFiles.find((f) => f.id === tab.props.name)
   if (file) {
     emit('change-file', file)
   }
 }
+
+// 组件卸载时清理编辑器实例
+onBeforeUnmount(() => {
+  editors.forEach((editor) => editor.dispose())
+  editors.clear()
+})
 </script>
 
 <style scoped>
