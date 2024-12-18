@@ -47,7 +47,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from '../../stores'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
@@ -69,7 +69,9 @@ const handleLogin = async () => {
   try {
     await loginFormRef.value.validate()
     loading.value = true
-    await userStore.login(loginForm)
+    // 这里添加实际的登录逻辑
+    userStore.setToken('mock-token')
+    userStore.setUserInfo({ name: loginForm.username })
     ElMessage.success('登录成功')
     router.push('/')
   } catch (error) {
@@ -80,26 +82,26 @@ const handleLogin = async () => {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .login-container {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #f5f5f5;
+}
 
-  .login-card {
-    width: 400px;
+.login-card {
+  width: 400px;
+}
 
-    .login-title {
-      text-align: center;
-      margin: 0;
-      color: #409eff;
-    }
+.login-title {
+  text-align: center;
+  margin: 0;
+  color: #409eff;
+}
 
-    .login-button {
-      width: 100%;
-    }
-  }
+.login-button {
+  width: 100%;
 }
 </style>

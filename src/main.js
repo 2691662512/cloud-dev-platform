@@ -5,7 +5,7 @@ import 'element-plus/dist/index.css'
 import router from './router'
 import App from './App.vue'
 // 引入全局样式
-import './styles/index.scss'
+import './styles/index.css'
 
 const app = createApp(App)
 const pinia = createPinia()
