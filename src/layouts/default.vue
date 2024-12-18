@@ -1,94 +1,113 @@
 <template>
-  <el-container class="layout-container">
-    <el-aside width="200px">
-      <el-menu
-        :router="true"
-        :default-active="route.path"
-        class="el-menu-vertical"
-      >
-        <el-menu-item index="/">
+  <div class="app-wrapper">
+    <!-- 侧边栏 -->
+    <div class="sidebar-container">
+      <el-menu :default-active="route.path" router>
+        <el-menu-item index="/dashboard">
           <el-icon><Monitor /></el-icon>
-          <span>控制台</span>
+          <span>仪表盘</span>
         </el-menu-item>
+
         <el-menu-item index="/projects">
           <el-icon><Folder /></el-icon>
           <span>项目管理</span>
         </el-menu-item>
-      </el-menu>
-    </el-aside>
 
-    <el-container>
-      <el-header>
-        <div class="header-right">
-          <el-dropdown @command="handleCommand">
-            <span class="el-dropdown-link">
-              {{ userStore.userInfo?.name || '用户' }}
-              <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+        <el-menu-item index="/ide">
+          <el-icon><Edit /></el-icon>
+          <span>在线 IDE</span>
+        </el-menu-item>
+      </el-menu>
+    </div>
+
+    <!-- 主要内容区 -->
+    <div class="main-container">
+      <!-- 头部 -->
+      <div class="navbar">
+        <div class="right-menu">
+          <el-dropdown>
+            <span class="avatar-wrapper">
+              {{ userStore.userInfo?.username }}
+              <el-icon><CaretBottom /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item @click="router.push('/profile')">
+                  个人信息
+                </el-dropdown-item>
+                <el-dropdown-item divided @click="handleLogout">
+                  退出登录
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </div>
-      </el-header>
+      </div>
 
-      <el-main>
+      <!-- 内容区 -->
+      <div class="app-main">
         <router-view />
-      </el-main>
-    </el-container>
-  </el-container>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '../stores/modules/user'
-import { Monitor, Folder, ArrowDown } from '@element-plus/icons-vue'
+import { Monitor, Folder, Edit, CaretBottom } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
-const handleCommand = (command) => {
-  if (command === 'logout') {
-    userStore.logout()
-    router.push('/login')
-  }
+const handleLogout = async () => {
+  await userStore.handleLogout()
+  router.push('/login')
 }
 </script>
 
 <style scoped>
-.layout-container {
+.app-wrapper {
+  display: flex;
   height: 100vh;
 }
 
-.el-header {
-  background-color: #fff;
-  border-bottom: 1px solid #dcdfe6;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 0 20px;
-}
-
-.el-aside {
-  background-color: #304156;
-}
-
-.el-menu-vertical {
+.sidebar-container {
+  width: 210px;
   height: 100%;
   background-color: #304156;
 }
 
-.header-right {
-  color: #333;
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.el-dropdown-link {
-  cursor: pointer;
-  color: #409eff;
+.navbar {
+  height: 50px;
+  border-bottom: 1px solid #dcdfe6;
   display: flex;
   align-items: center;
+  padding: 0 20px;
+}
+
+.right-menu {
+  margin-left: auto;
+}
+
+.avatar-wrapper {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-main {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
 }
 </style>

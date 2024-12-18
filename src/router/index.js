@@ -10,28 +10,34 @@ const routes = [
   {
     path: '/',
     component: () => import('../layouts/default.vue'),
+    redirect: '/dashboard', // 添加重定向
     children: [
       {
-        path: '',
+        path: 'dashboard',
         name: 'Dashboard',
         component: () => import('../views/dashboard/index.vue'),
       },
       {
-        path: '/projects',
+        path: 'projects',
         name: 'Projects',
         component: () => import('../views/projects/index.vue'),
       },
       {
-        path: '/ide',
+        path: 'ide',
         name: 'IDE',
         component: () => import('../views/ide/index.vue'),
       },
       {
-        path: '/ide/:projectId',
+        path: 'ide/:projectId',
         name: 'IDEProject',
         component: () => import('../views/ide/project.vue'),
       },
     ],
+  },
+  // 添加404路由
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
   },
 ]
 
@@ -44,12 +50,14 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
 
-  if (to.meta.requiresAuth && !userStore.token) {
+  // 如果未登录且不是登录页，重定向到登录页
+  if (!userStore.token && to.path !== '/login') {
     next('/login')
     return
   }
 
-  if (to.meta.roles && !to.meta.roles.includes(userStore.userInfo?.role)) {
+  // 如果已登录且访问登录页，重定向到首页
+  if (userStore.token && to.path === '/login') {
     next('/')
     return
   }
