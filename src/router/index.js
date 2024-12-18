@@ -1,68 +1,68 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '../stores/modules/user'
-
 const routes = [
   {
+    path: '/',
+    redirect: '/dashboard',
+  },
+  {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import('../views/dashboard/index.vue'),
+  },
+  {
     path: '/login',
-    name: 'Login',
+    name: 'login',
     component: () => import('../views/login/index.vue'),
   },
   {
-    path: '/',
-    component: () => import('../layouts/default.vue'),
-    redirect: '/dashboard', // 添加重定向
-    children: [
-      {
-        path: 'dashboard',
-        name: 'Dashboard',
-        component: () => import('../views/dashboard/index.vue'),
-      },
-      {
-        path: 'projects',
-        name: 'Projects',
-        component: () => import('../views/projects/index.vue'),
-      },
-      {
-        path: 'ide',
-        name: 'IDE',
-        component: () => import('../views/ide/index.vue'),
-      },
-      {
-        path: 'ide/:projectId',
-        name: 'IDEProject',
-        component: () => import('../views/ide/project.vue'),
-      },
-    ],
+    path: '/register',
+    name: 'register',
+    component: () => import('../views/register/index.vue'),
   },
-  // 添加404路由
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../views/profile/index.vue'),
+  },
+  {
+    path: '/project',
+    name: 'project',
+    component: () => import('../views/project/index.vue'),
+  },
+  {
+    path: '/workspace',
+    name: 'workspace',
+    component: () => import('../views/workspace/index.vue'),
+  },
+  // 404 页面配置
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/',
+    name: 'NotFound',
+    component: () => import('../views/error/404.vue'),
   },
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
-
-// 路由守卫
+// 全局前置守卫
 router.beforeEach((to, from, next) => {
-  const userStore = useUserStore()
+  // 获取 token
+  const token = localStorage.getItem('token')
 
-  // 如果未登录且不是登录页，重定向到登录页
-  if (!userStore.token && to.path !== '/login') {
-    next('/login')
+  // 如果访问的是登录或注册页面，直接放行
+  if (to.path === '/login' || to.path === '/register') {
+    next()
     return
   }
 
-  // 如果已登录且访问登录页，重定向到首页
-  if (userStore.token && to.path === '/login') {
-    next('/')
+  // 其他页面需要验证 token
+  if (!token) {
+    next('/login')
     return
   }
 
   next()
 })
-
 export default router
