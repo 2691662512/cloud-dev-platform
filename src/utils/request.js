@@ -4,11 +4,11 @@
  * @Author: dty
  * @Date: 2024-12-18 16:02:09
  * @LastEditors: dty
- * @LastEditTime: 2024-12-18 16:02:27
+ * @LastEditTime: 2024-12-18 21:58:27
  */
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from '../stores'
 
 // 创建axios实例
 const service = axios.create({

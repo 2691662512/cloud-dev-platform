@@ -1,11 +1,3 @@
-/*
- * @Descripttion: 组件业务名
- * @version:
- * @Author: dty
- * @Date: 2024-12-18 17:32:29
- * @LastEditors: dty
- * @LastEditTime: 2024-12-18 17:33:06
- */
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
